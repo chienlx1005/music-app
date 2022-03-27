@@ -77,6 +77,17 @@ header h2 {
   background-size: cover;
   margin: auto;
 }
+.cd-thumb-active {
+  animation: ani 10000 infinite;
+}
+@keyframes ani {
+  from {
+    transform: 0;
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 /* CONTROL */
 .control {

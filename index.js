@@ -85,7 +85,7 @@ const app = {
     const htmls = this.songs.map((song,index) => {
       return `<div class="song ${index === this.currentIndex? 'active' : ''}" data-index = "${index}">
         <div
-          class="thumb"
+          class="thumb "
           style="
             background-image: url('${song.image}')
           "
@@ -117,10 +117,12 @@ const app = {
       }
     ],{
       duration: 10000,// 10s 
-      interations : Infinity,
+      interation: Infinity,
       
 
     })
+
+    // const cdThumbAnimate = cdThumb.animate(this.rotate360,this.timing10Sec)
     cdThumbAnimate.pause()
 
 
@@ -153,6 +155,7 @@ const app = {
       player.classList.add('playing')
       _this.isPlaying = true
       cdThumbAnimate.play()
+      _this.render()
     }
     // khi song pause 
     audio.onpause =function(){
