@@ -84,11 +84,11 @@ const app = {
     // xu ly cd quay/dung
     const cdThumbAnimate = cdThumb.animate([
       {
-        transform: 'rotate(360deg'
+        transform: 'rotate(360deg)'
       }
     ],{
       duration: 10000,// 10s 
-      interactions: Infinity,
+      interations: Infinity,
 
     })
     cdThumbAnimate.pause()
