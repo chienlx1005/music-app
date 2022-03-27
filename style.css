@@ -150,6 +150,7 @@ header h2 {
 
 .song:active {
   opacity: 0.8;
+  cursor: pointer;
 }
 
 .song.active .option,

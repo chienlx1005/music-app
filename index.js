@@ -1,5 +1,6 @@
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
+const PLAYER_STORAGE_KEY = 'Music-player'
 
 const heading = $('header h2')
 const cdThumb = $('.cd-thumb')
@@ -11,12 +12,17 @@ const progress = $('#progress')
 const nextBtn = $('.btn-next');
 const preBtn = $('.btn-prev')
 const randomBtn = $('.btn-random')
+const repeatBtn = $('.btn-repeat')
+const playlist =$(".playlist")
+
 
 
 const app = {
   currentIndex: 0,
   isPlaying: false,
   isRandom: false,
+  isRepeat: false,
+  config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
   songs: [
     {
       name: "Nếu em còn tồn tại",
@@ -49,12 +55,35 @@ const app = {
       path: "./assets/mp3/tinh-yeu-mau-hong.mp3",
       image: "./assets/img/song5.jpg",
     },
+    {
+      name: "Anh yêu vội thế",
+      singer: "Remix tiktok",
+      path: "./assets/mp3/anh-yeu-voi-the-song6.mp3",
+      image: "./assets/img/song6.jpg",
+    },
+    {
+      name: "Quan Sơn Tửu",
+      singer: "ABC ZỸ",
+      path: "./assets/mp3/quansontuu-song7.mp3",
+      image: "./assets/img/song7.jpg",
+    },
+    {
+      name: "Đoạn tuyệt nàng đi - Nhạc múa Flo",
+      singer: "Fo lo ti lô",
+      path: "./assets/mp3/doantuyetnangdi-song8.mp3",
+      image: "./assets/img/song8.jpg",
+    },
+    
     
   ],
+  setConfig: function(key,value){
+    this.config[key] =value
+    localStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify(this.config))
+  },
   // render
   render: function () {
-    const htmls = this.songs.map((song) => {
-      return `<div class="song">
+    const htmls = this.songs.map((song,index) => {
+      return `<div class="song ${index === this.currentIndex? 'active' : ''}" data-index = "${index}">
         <div
           class="thumb"
           style="
@@ -70,7 +99,7 @@ const app = {
         </div>
       </div>`
     })
-    $(".playlist").innerHTML = htmls.join("")
+    playlist.innerHTML = htmls.join("")
   },
   defineProperties: function(){
     Object.defineProperty(this,'currentSong',{
@@ -88,7 +117,8 @@ const app = {
       }
     ],{
       duration: 10000,// 10s 
-      interations: Infinity,
+      interations : Infinity,
+      
 
     })
     cdThumbAnimate.pause()
@@ -154,6 +184,8 @@ const app = {
         _this.nextSong()
       }
         audio.play()
+        _this.render()
+        _this.scrollToActiveSong()
     }
     preBtn.onclick = function(){
       if(_this.isRandom){
@@ -163,22 +195,59 @@ const app = {
         _this.preSong()
       }
       audio.play()
+      _this.render()
+      _this.scrollToActiveSong()
     }
     // random song
     randomBtn.onclick = function(e){
      _this.isRandom = ! _this.isRandom
+     _this.setConfig('isRandom',_this.isRandom)
       randomBtn.classList.toggle('active',_this.isRandom)
+      
      
+    }
+     // xu ly repeat
+     repeatBtn.onclick = function(){
+      _this.isRepeat = !_this.isRepeat
+      _this.setConfig('isRepeat', _this.isRepeat)
+      repeatBtn.classList.toggle('active',_this.isRepeat)
+      
     }
     // xu ly next khi end
     audio.onended = function(){
       if(_this.isRandom){
         _this.randomSong()
-      }else{
-
+       
+      }if(_this.isRepeat){
+        
+      }
+      else{
         _this.nextSong()
       }
-        audio.play()
+      audio.play()
+        
+    }
+   
+    
+    // lang nghe su kien click vao song
+    playlist.onclick = function(e){
+      const songNode = e.target.closest('.song:not(.active)')
+      if(songNode || e.target.closest('.option')){
+        
+        // xu ly click vao song
+        if(songNode){
+          // console.log(songNode.getAttribute('data-index'))
+          _this.currentIndex = Number(songNode.dataset.index)
+          _this.loadCurrentSong()
+          _this.render()
+          audio.play()
+          
+        }
+        if(e.target.closest('.option')){
+          
+        }
+        
+      }
     }
 
   },
@@ -188,6 +257,15 @@ const app = {
     audio.src = this.currentSong.path
     
   },
+  scrollToActiveSong: function(){
+    setTimeout(()=> {
+      $('.song.active').scrollIntoView({
+        behavior: 'smooth'
+      })
+
+    },300)
+  }
+  ,
   randomSong: function(){
     let newIndex
     do{
@@ -197,6 +275,10 @@ const app = {
     this.currentIndex = newIndex
     
     this.loadCurrentSong()
+  },
+  loadConfig: function(){
+    this.isRandom = this.config.isRandom
+    this.isRepeat = this.config.isRepeat
   },
   nextSong: function(){
     this.currentIndex++
@@ -215,6 +297,9 @@ const app = {
     
   },
   start: function () {
+    // cau hinh luc start server
+    this.loadConfig()
+    
     // Dinh nghia cac thuoc tinh cho object
     this.defineProperties()
 
@@ -224,6 +309,10 @@ const app = {
     this.loadCurrentSong()
     // render ung dung
     this.render()
+    // hien thi trang thai ban dau 
+    randomBtn.classList.toggle('active',this.isRandom)
+    repeatBtn.classList.toggle('active',this.isRepeat)
+    
   },
 }
 app.start()
