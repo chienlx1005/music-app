@@ -88,7 +88,7 @@ const app = {
       }
     ],{
       duration: 10000,// 10s 
-      interations: Infinity,
+      interactions: Infinity,
 
     })
     cdThumbAnimate.pause()
